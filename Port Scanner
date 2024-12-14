@@ -1,0 +1,55 @@
+#>>> retarded imports ???
+import socket
+import requests
+
+#>>> banner for terminal/cmd prompt.
+def banner():
+    print("""
+    ======================================
+          NVS - Network Vulnerability Scanner
+    ======================================
+    """)
+#>>> scan open ports
+def scan_open_ports(host):
+    """Scan open ports on a host using socket"""
+    print(f"[INFO] Scanning open ports on {host}...")
+    open_ports = []
+    for port in range(1, 1025): #scan through all ports 1 - 1024
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.5)
+                if s.connect_ex((host, port)) == 0:
+                    open_ports.append(port)
+        except Exception as e:
+            print(f"[ERROR] {e}")
+    if open_ports:
+        print(f"[INFO] Open ports on {host}: {open_ports}")
+    else:
+        print(f"[INFO] No open ports found on {host}.")
+#check all http headers for issues/errors
+def check_http_headers(url):
+    """Checking All HTTP headers for issues/errors."""
+    print(f"[INFO] Checking HTTP headers for {url}...")
+    try:
+        response = requests.get(url)
+        headers = response.headers
+        print("Headers:")
+        for header, value in headers.items():
+            print(f"{header}: {value}")
+
+        #>>> check for all security headers
+        
+        #>>> print if header not-found.
+        if 'X-Frame-Options' not in headers:
+            print("[WARNING] X-Frame-Options header is missing!")
+        if 'X-Content-Type-Options' not in headers:
+            print("[WARNING] X-Content-Type-Options header is missing!")
+        if 'Content-Security-Policy' not in headers:
+            print("[WARNING] Content-Security-Policy header is missing!")
+        if 'Strict-Transport-Security' not in headers:
+            print("[WARNING] Strict-Transport-Security header is missing!")
+    except Exception as e:
+        print(f"[ERROR] {e}")
+#run definded
+banner()
+check_http_headers()
